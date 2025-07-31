@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="UI + API Automation Framework Suite" parallel="tests" thread-count="2">
+    
+    <test name="UI Tests" parallel="classes" thread-count="2">
+        <classes>
+            <class name="com.automation.runners.UITestRunner"/>
+        </classes>
+    </test>
+    
+    <test name="API Tests" parallel="classes" thread-count="2">
+        <classes>
+            <class name="com.automation.runners.APITestRunner"/>
+        </classes>
+    </test>
+    
+    <test name="Integration Tests" parallel="classes" thread-count="1">
+        <classes>
+            <class name="com.automation.runners.IntegrationTestRunner"/>
+        </classes>
+    </test>
+    
+    <listeners>
+        <listener class-name="com.automation.listeners.TestListener"/>
+        <listener class-name="com.automation.listeners.ExtentReportListener"/>
+    </listeners>
+    
+</suite>
