@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Automation Test Suite" parallel="classes" thread-count="3">
+    
+    <parameter name="browser" value="chrome"/>
+    <parameter name="environment" value="dev"/>
+    
+    <listeners>
+        <listener class-name="com.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="All Tests" preserve-order="true">
+        <classes>
+            <class name="com.automation.runners.TestRunner"/>
+        </classes>
+    </test>
+    
+    <test name="API Tests Only" preserve-order="true">
+        <classes>
+            <class name="com.automation.runners.ApiTestRunner"/>
+        </classes>
+    </test>
+    
+    <test name="UI Tests Only" preserve-order="true">
+        <classes>
+            <class name="com.automation.runners.UiTestRunner"/>
+        </classes>
+    </test>
+    
+</suite>
