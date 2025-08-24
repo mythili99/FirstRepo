@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.automation</groupId>
-    <artifactId>ui-api-automation-framework</artifactId>
+    <artifactId>selenium-cucumber-framework</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>UI + API Automation Framework</name>
-    <description>Comprehensive automation framework with Selenium, Cucumber, TestNG, and RestAssured</description>
+    <name>Selenium Cucumber Test Automation Framework</name>
+    <description>Reusable UI + API automation framework with Selenium, Cucumber, TestNG</description>
+
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     
+        <!-- Dependency Versions -->
         <selenium.version>4.15.0</selenium.version>
-        <cucumber.version>7.14.0</cucumber.version>
         <testng.version>7.8.0</testng.version>
+        <cucumber.version>7.14.1</cucumber.version>
         <restassured.version>5.3.2</restassured.version>
-        <extentreports.version>5.0.9</extentreports.version>
-        <log4j.version>2.20.0</log4j.version>
-        <poi.version>5.2.4</poi.version>
+        <extentreports.version>5.1.1</extentreports.version>
+        <log4j.version>2.21.1</log4j.version>
+        <apache.poi.version>5.2.4</apache.poi.version>
         <jackson.version>2.15.2</jackson.version>
         <mysql.version>8.0.33</mysql.version>
+        <webdrivermanager.version>5.6.2</webdrivermanager.version>
     </properties>
 
     <dependencies>
@@ -33,6 +38,21 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
+        </dependency>
+
+
+        <!-- WebDriverManager for automatic driver management -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager.version}</version>
+        </dependency>
+
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
         </dependency>
 
         <!-- Cucumber -->
@@ -78,31 +98,35 @@
             <version>${extentreports.version}</version>
         </dependency>
 
-        <!-- Log4j -->
+
+        <!-- Log4j Logging -->
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
         </dependency>
 
-        <!-- Excel Support -->
+        <!-- Apache POI for Excel operations -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
+            <version>${apache.poi.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
+            <version>${apache.poi.version}</version>
         </dependency>
 
-        <!-- JSON Support -->
+        <!-- Jackson for JSON processing -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -114,23 +138,31 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Database Support -->
+        <!-- MySQL Connector for Database operations -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- WebDriverManager -->
+        <!-- Commons IO for file operations -->
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>5.5.3</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+        <!-- AssertJ for fluent assertions -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -140,16 +172,51 @@
                     <target>11</target>
                 </configuration>
             </plugin>
+            <!-- Maven Surefire Plugin for TestNG -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.2</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
+
+            <!-- Maven Failsafe Plugin for integration tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.2</version>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Different environment profiles -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>qa</id>
+            <properties>
+                <env>qa</env>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+            </properties>
+        </profile>
+    </profiles>
 </project>
