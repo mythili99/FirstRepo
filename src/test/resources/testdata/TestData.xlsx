@@ -1,0 +1,19 @@
+# This is a placeholder for Excel file content
+# In a real scenario, you would create an actual Excel file with the following structure:
+#
+# Sheet: LoginData
+# Username | Password | ExpectedResult
+# testuser | password123 | SUCCESS
+# invaliduser | wrongpass | FAILURE
+# emptyuser | password123 | FAILURE
+#
+# Sheet: UserData
+# FirstName | LastName | Email | Phone
+# John | Doe | john.doe@test.com | 1234567890
+# Jane | Smith | jane.smith@test.com | 0987654321
+#
+# Sheet: APITestData
+# Endpoint | Method | ExpectedStatus | ExpectedResponse
+# /users | GET | 200 | users_list
+# /users/1 | GET | 200 | user_details
+# /users | POST | 201 | user_created
