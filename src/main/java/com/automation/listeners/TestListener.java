@@ -1,7 +1,7 @@
 package com.automation.listeners;
 
 import com.automation.core.LoggerManager;
-import com.automation.core.WebDriverManager;
+import com.automation.core.CustomDriverManager;
 import com.automation.reporting.ExtentReportManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestContext;
@@ -105,7 +105,7 @@ public class TestListener implements ITestListener {
 
     private void takeScreenshotOnFailure(String testName) {
         try {
-            WebDriverManager webDriverManager = WebDriverManager.getInstance();
+            CustomDriverManager webDriverManager = CustomDriverManager.getInstance();
             if (webDriverManager.getDriver() != null) {
                 String screenshotPath = webDriverManager.takeScreenshot(testName);
                 if (screenshotPath != null) {

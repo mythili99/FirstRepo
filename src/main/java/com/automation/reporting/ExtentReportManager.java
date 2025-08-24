@@ -138,12 +138,7 @@ public class ExtentReportManager {
         }
     }
 
-    public void closeReports() {
-        if (extentReports != null) {
-            extentReports.close();
-            logger.info("ExtentReports closed successfully");
-        }
-    }
+
 
     public ExtentReports getExtentReports() {
         return extentReports;

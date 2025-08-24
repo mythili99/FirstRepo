@@ -1,12 +1,13 @@
 package com.automation.hooks;
 
 import com.automation.core.LoggerManager;
-import com.automation.core.WebDriverManager;
+import com.automation.core.CustomDriverManager;
 import com.automation.reporting.ExtentReportManager;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.TakesScreenshot;
 
 /**
  * Cucumber hooks for setup and teardown operations
@@ -56,7 +57,7 @@ public class Hooks {
     public void setUpUI() {
         logger.info("Setting up UI test environment");
         // Initialize WebDriver for UI tests
-        WebDriverManager.getInstance().getDriver();
+        CustomDriverManager.getInstance().getDriver();
     }
 
     @After("@ui")
@@ -99,9 +100,19 @@ public class Hooks {
 
     private String takeScreenshotOnFailure(String scenarioName) {
         try {
-            WebDriverManager webDriverManager = WebDriverManager.getInstance();
+            CustomDriverManager webDriverManager = CustomDriverManager.getInstance();
             if (webDriverManager.getDriver() != null) {
-                return webDriverManager.takeScreenshot(scenarioName + "_failure");
+                // Use the WebDriver's screenshot capability directly
+                TakesScreenshot ts = (TakesScreenshot) webDriverManager.getDriver();
+                String screenshotPath = "target/screenshots/" + scenarioName + "_failure_" + System.currentTimeMillis() + ".png";
+                // Save screenshot to file
+                try {
+                    java.nio.file.Files.write(java.nio.file.Paths.get(screenshotPath), ts.getScreenshotAs(org.openqa.selenium.OutputType.BYTES));
+                } catch (Exception e) {
+                    logger.error("Failed to save screenshot to file: {}", screenshotPath, e);
+                }
+                logger.info("Screenshot taken on failure: {}", screenshotPath);
+                return screenshotPath;
             }
         } catch (Exception e) {
             logger.error("Failed to take screenshot on failure", e);
@@ -111,7 +122,7 @@ public class Hooks {
 
     private void cleanupWebDriver() {
         try {
-            WebDriverManager webDriverManager = WebDriverManager.getInstance();
+            CustomDriverManager webDriverManager = CustomDriverManager.getInstance();
             if (webDriverManager.getDriver() != null) {
                 // Don't quit the driver here as it might be reused
                 // The driver will be quit in the test runner's @AfterClass method

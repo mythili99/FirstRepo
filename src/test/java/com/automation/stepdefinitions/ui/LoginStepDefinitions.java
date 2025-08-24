@@ -2,6 +2,7 @@ package com.automation.stepdefinitions.ui;
 
 import com.automation.core.ConfigManager;
 import com.automation.core.LoggerManager;
+import com.automation.core.WebDriverManager;
 import com.automation.data.TestDataManager;
 import com.automation.ui.pages.LoginPage;
 import com.automation.reporting.ExtentReportManager;
@@ -26,7 +27,6 @@ public class LoginStepDefinitions {
     private final ExtentReportManager extentReportManager = ExtentReportManager.getInstance();
     
     private LoginPage loginPage;
-    private String currentUsername;
     private String currentPassword;
 
     @Before
@@ -43,7 +43,7 @@ public class LoginStepDefinitions {
     @Given("I am on the login page")
     public void iAmOnTheLoginPage() {
         String baseUrl = configManager.getBaseUrl();
-        loginPage.navigateTo(baseUrl + "/login");
+        WebDriverManager.getInstance().getDriver().get(baseUrl + "/login");
         logger.info("Navigated to login page: {}", baseUrl + "/login");
         extentReportManager.logInfo(extentReportManager.createTest("Login Navigation"), 
                                  "Navigated to login page");
@@ -60,7 +60,6 @@ public class LoginStepDefinitions {
 
     @When("I enter valid username {string}")
     public void iEnterValidUsername(String username) {
-        this.currentUsername = username;
         loginPage.enterUsername(username);
         logger.info("Entered valid username: {}", username);
         extentReportManager.logInfo(extentReportManager.createTest("Username Entry"), 
@@ -78,7 +77,6 @@ public class LoginStepDefinitions {
 
     @When("I enter invalid username {string}")
     public void iEnterInvalidUsername(String username) {
-        this.currentUsername = username;
         loginPage.enterUsername(username);
         logger.info("Entered invalid username: {}", username);
         extentReportManager.logInfo(extentReportManager.createTest("Invalid Username Entry"), 
@@ -96,7 +94,6 @@ public class LoginStepDefinitions {
 
     @When("I leave the username field empty")
     public void iLeaveTheUsernameFieldEmpty() {
-        this.currentUsername = "";
         loginPage.clearUsername();
         logger.info("Left username field empty");
         extentReportManager.logInfo(extentReportManager.createTest("Empty Username"), 

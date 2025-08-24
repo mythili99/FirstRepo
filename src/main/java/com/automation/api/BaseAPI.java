@@ -31,9 +31,6 @@ public abstract class BaseAPI {
 
     private void setupRestAssured() {
         RestAssured.baseURI = baseUrl;
-        RestAssured.timeout = Duration.ofSeconds(configManager.getIntProperty("api.timeout", 30));
-        RestAssured.connectionTimeout = Duration.ofSeconds(configManager.getIntProperty("api.connection.timeout", 10));
-        RestAssured.readTimeout = Duration.ofSeconds(configManager.getIntProperty("api.read.timeout", 30));
         
         logger.info("RestAssured configured with base URL: {}", baseUrl);
     }

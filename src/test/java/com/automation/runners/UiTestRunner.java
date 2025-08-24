@@ -2,26 +2,61 @@ package com.automation.runners;
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
+import com.automation.core.ConfigManager;
+import com.automation.core.LoggerManager;
+import com.automation.core.CustomDriverManager;
+import com.automation.reporting.ExtentReportManager;
+import org.apache.logging.log4j.Logger;
+
 /**
- * TestNG runner for UI-specific Cucumber tests
+ * UI Test Runner for Cucumber with TestNG integration
  */
 @CucumberOptions(
-    features = "src/test/resources/features",
-    glue = {"com.automation.steps"},
-    tags = "@ui",
+    features = "src/test/resources/features/ui",
+    glue = {"com.automation.stepdefinitions.ui", "com.automation.hooks"},
     plugin = {
         "pretty",
-        "html:target/cucumber-reports/ui-html",
-        "json:target/cucumber-reports/ui-cucumber.json",
-        "junit:target/cucumber-reports/ui-cucumber.xml"
+        "html:target/cucumber-reports/ui-cucumber-report.html",
+        "json:target/cucumber-reports/ui-cucumber-report.json",
+        "junit:target/cucumber-reports/ui-cucumber-report.xml"
     },
     monochrome = true,
-    dryRun = false
+    dryRun = false,
+    publish = false
 )
-public class UiTestRunner extends AbstractTestNGCucumberTests {
-    
+public class UITestRunner extends AbstractTestNGCucumberTests {
+    private static final Logger logger = LoggerManager.getInstance().getLogger(UITestRunner.class);
+    private final ConfigManager configManager = ConfigManager.getInstance();
+    private final ExtentReportManager extentReportManager = ExtentReportManager.getInstance();
+
+    @BeforeClass
+    public void setUp() {
+        logger.info("Setting up UI Test Runner");
+        logger.info("Browser: {}", configManager.getBrowser());
+        logger.info("Headless: {}", configManager.isHeadless());
+        logger.info("Base URL: {}", configManager.getBaseUrl());
+        
+        extentReportManager.logInfo(extentReportManager.createTest("UI Test Setup"), 
+                                 "UI Test Runner setup completed");
+    }
+
+    @AfterClass
+    public void tearDown() {
+        logger.info("Tearing down UI Test Runner");
+        
+        // Quit WebDriver
+        CustomDriverManager.getInstance().quitDriver();
+        
+        // Close reports
+        extentReportManager.closeReports();
+        
+        logger.info("UI Test Runner teardown completed");
+    }
+
     @Override
     @DataProvider(parallel = true)
     public Object[][] scenarios() {
