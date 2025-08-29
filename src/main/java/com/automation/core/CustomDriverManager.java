@@ -50,6 +50,10 @@ public class CustomDriverManager {
 
         logger.info("Creating WebDriver for browser: {} (headless: {})", browser.getValue(), headless);
 
+        String runEnv = System.getProperty("run.env");
+
+
+
         switch (browser) {
             case CHROME:
                 return createChromeDriver(headless);
@@ -65,62 +69,89 @@ public class CustomDriverManager {
     }
 
     private WebDriver createChromeDriver(boolean headless) {
-        String driverPath = getDriverPath("chromedriver");
-        System.setProperty("webdriver.chrome.driver", driverPath);
-        
+
+        if (runEnv != null && runEnv.equalsIgnoreCase("ci")) {
+            WebDriverManager.chromedriver().setup();
+            logger.info("Using WebDriverManager to setup ChromeDriver");
+        } else {
+            String driverPath = getDriverPath("chromedriver");
+            System.setProperty("webdriver.chrome.driver", driverPath);
+        }
+
         ChromeOptions options = new ChromeOptions();
-        
+
         if (headless) {
             options.addArguments("--headless");
         }
-        
+
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--remote-allow-origins=*");
-        
+
         return new ChromeDriver(options);
     }
 
     private WebDriver createFirefoxDriver(boolean headless) {
-        String driverPath = getDriverPath("geckodriver");
-        System.setProperty("webdriver.gecko.driver", driverPath);
-        
+
+        if (runEnv != null && runEnv.equalsIgnoreCase("ci")) {
+            WebDriverManager.chromedriver().setup();
+            logger.info("Using WebDriverManager to setup ChromeDriver");
+        } else {
+            String driverPath = getDriverPath("geckodriver");
+            System.setProperty("webdriver.gecko.driver", driverPath);
+        }
+
+
         FirefoxOptions options = new FirefoxOptions();
-        
+
         if (headless) {
             options.addArguments("--headless");
         }
-        
+
         options.addArguments("--width=1920");
         options.addArguments("--height=1080");
-        
+
         return new FirefoxDriver(options);
     }
 
     private WebDriver createEdgeDriver(boolean headless) {
-        String driverPath = getDriverPath("msedgedriver");
-        System.setProperty("webdriver.edge.driver", driverPath);
-        
+
+        if (runEnv != null && runEnv.equalsIgnoreCase("ci")) {
+            WebDriverManager.chromedriver().setup();
+            logger.info("Using WebDriverManager to setup ChromeDriver");
+        } else {
+            String driverPath = getDriverPath("msedgedriver");
+            System.setProperty("webdriver.edge.driver", driverPath);           }
+
+
+
+
+
         EdgeOptions options = new EdgeOptions();
-        
+
         if (headless) {
             options.addArguments("--headless");
         }
-        
+
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--window-size=1920,1080");
-        
+
         return new EdgeDriver(options);
     }
 
     private WebDriver createSafariDriver() {
-        // Safari doesn't support headless mode
-        String driverPath = getDriverPath("safaridriver");
-        System.setProperty("webdriver.safari.driver", driverPath);
-        
+        if (runEnv != null && runEnv.equalsIgnoreCase("ci")) {
+            WebDriverManager.chromedriver().setup();
+            logger.info("Using WebDriverManager to setup ChromeDriver");
+        } else {
+            // Safari doesn't support headless mode
+
+            String driverPath = getDriverPath("safaridriver");
+            System.setProperty("webdriver.safari.driver", driverPath);
+        }
         SafariOptions options = new SafariOptions();
         return new SafariDriver(options);
     }
@@ -129,7 +160,7 @@ public class CustomDriverManager {
         String driversFolder = configManager.getProperty("drivers.folder.path", "drivers");
         String os = System.getProperty("os.name").toLowerCase();
         String extension = "";
-        
+
         // Determine file extension based on OS
         if (os.contains("win")) {
             extension = ".exe";
@@ -138,28 +169,28 @@ public class CustomDriverManager {
         } else if (os.contains("linux")) {
             extension = "";
         }
-        
+
         String driverPath = driversFolder + File.separator + os + File.separator + driverName + extension;
         File driverFile = new File(driverPath);
-        
+
         if (!driverFile.exists()) {
-            throw new RuntimeException("Driver not found at path: " + driverPath + 
-                "\nPlease ensure the driver executable is placed in the correct folder structure:\n" +
-                "drivers/\n" +
-                "├── windows/\n" +
-                "│   ├── chromedriver.exe\n" +
-                "│   ├── geckodriver.exe\n" +
-                "│   └── msedgedriver.exe\n" +
-                "├── mac/\n" +
-                "│   ├── chromedriver\n" +
-                "│   ├── geckodriver\n" +
-                "│   └── msedgedriver\n" +
-                "└── linux/\n" +
-                "    ├── chromedriver\n" +
-                "    ├── geckodriver\n" +
-                "    └── msedgedriver");
+            throw new RuntimeException("Driver not found at path: " + driverPath +
+                    "\nPlease ensure the driver executable is placed in the correct folder structure:\n" +
+                    "drivers/\n" +
+                    "├── windows/\n" +
+                    "│   ├── chromedriver.exe\n" +
+                    "│   ├── geckodriver.exe\n" +
+                    "│   └── msedgedriver.exe\n" +
+                    "├── mac/\n" +
+                    "│   ├── chromedriver\n" +
+                    "│   ├── geckodriver\n" +
+                    "│   └── msedgedriver\n" +
+                    "└── linux/\n" +
+                    "    ├── chromedriver\n" +
+                    "    ├── geckodriver\n" +
+                    "    └── msedgedriver");
         }
-        
+
         logger.info("Using driver from path: {}", driverPath);
         return driverPath;
     }
@@ -168,7 +199,7 @@ public class CustomDriverManager {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(configManager.getImplicitWait()));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(configManager.getPageLoadTimeout()));
         driver.manage().window().maximize();
-        
+
         logger.info("WebDriver setup completed");
     }
 
@@ -211,12 +242,12 @@ public class CustomDriverManager {
 
     public String takeScreenshot(String testName) {
         try {
-            String screenshotPath = configManager.getProperty("screenshot.path") + "/" + 
-                                  testName + "_" + System.currentTimeMillis() + ".png";
-            
+            String screenshotPath = configManager.getProperty("screenshot.path") + "/" +
+                    testName + "_" + System.currentTimeMillis() + ".png";
+
             // Screenshot logic would be implemented here
             logger.info("Screenshot taken: {}", screenshotPath);
-            
+
             return screenshotPath;
         } catch (Exception e) {
             logger.error("Failed to take screenshot", e);
