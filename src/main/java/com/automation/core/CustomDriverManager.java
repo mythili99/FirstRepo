@@ -50,7 +50,7 @@ public class CustomDriverManager {
 
         logger.info("Creating WebDriver for browser: {} (headless: {})", browser.getValue(), headless);
 
-        String runEnv = System.getProperty("run.env");
+        String runEnv = configManager.getProperty("run.env");
 
 
 
